@@ -1,7 +1,7 @@
 # myExpRepo
 Template repository for javascript experiments for CCN Lab. There are 2 flavours of experiments: ones that go directly on the lab's experiment website, and ones that will be served by psiTurk. The task is a short demo of the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3390186/">classic RLWM experiment</a>. 
 
-## for_lab_website
+## for_lab_website: WMRL probabilistic reward
 This folder contains files and folders needed for an experiment that will be hosted on our lab website. It contains:
 * exp.html: the page of the actual experiment
 * save_data.php: the php file that will save data on the server-end
