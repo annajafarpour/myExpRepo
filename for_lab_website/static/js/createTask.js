@@ -14,7 +14,7 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
         0- subjID, number
         1- stimuli
         2- action
-        3- rule
+        3- rule (= action + 1), redundant really..
         4- ns
         5- block_index
         6_imgFolder
@@ -23,7 +23,7 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
   let seqs = {}; // convert 2D array into object
     
   seqs.allStims = csv[1];   // sequence of all stimuli across blocks
-  seqs.corKey   = csv[3];     // sequence of all correct key responses across blocks
+  seqs.corKey   = csv[2];     // sequence of all correct key responses across blocks
   seqs.setSizes     = csv[4];    // sequence of all set sizes across blocks
   seqs.allBlocks    = csv[5];   // sequence of all block numbers across blocks
   seqs.imgFolders   = csv[6]; // sequence of all image folders across blocks
@@ -111,24 +111,24 @@ const createBlock = function(b,seqs) {
         let stim = seqs.allStims[bStart+t];
         let cor = seqs.corKey[bStart+t];
         let FBprobSeq = seqs.FBprobSeq[bStart+t];
-        //createTrial(b,t,folder,stim,cor,FBprobSeq,bStart);
-        createTrial(b,t,folder,stim,cor,bStart);
+        createTrial(b,t,folder,stim,cor,FBprobSeq,bStart);
+        //createTrial(b,t,folder,stim,cor,bStart); // without prob. reward if correct.
     }
 
   /*A helper function that updates points earned for that block. It also saves all of the
   data if it's the last block, or data for just that block if it's not the last block.*/
   const setPoints = function(trial) {
 
-    let toSave = jsPsych.data.get().filter({block: b}); // retrieve block data to save
-    let blockFileName = `${file_name}_block_${b}`; // create new file name for block data
-    save_data_csv(blockFileName, toSave); // save block data
-
-    //let pts = jsPsych.data.get().filter({block: b, rewarded: true}).count(); // calculate points
-      let pts = jsPsych.data.get().filter({block: b, correct: true}).count(); // calculate points
-    //console.log(pts);
-    trial.stimulus = `<div class="center"><p>Total number of earned points: ${pts} out of ${numTrials}.</p>\
-    <br><p>End of block - Please take a break!</p><br><p>Press space when \
-    you're ready to move to the next block.</p></div>`;
+        let toSave = jsPsych.data.get().filter({block: b}); // retrieve block data to save
+        let blockFileName = `${file_name}_block_${b}`; // create new file name for block data
+        save_data_csv(blockFileName, toSave); // save block data
+        
+        let pts = jsPsych.data.get().filter({block: b, reward: true}).count(); // calculate points based on reward
+      //let pts = jsPsych.data.get().filter({block: b, correct: true}).count(); // calculate points
+        console.log(pts);
+        trial.stimulus = `<div class="center"><p>Total number of earned points: ${pts} out of ${numTrials}.</p>\
+        <br><p>End of block - Please take a break!</p><br><p>Press space when \
+        you're ready to move to the next block.</p></div>`;
   }
 
   // push block end points and instructions
@@ -149,15 +149,24 @@ You can also call your save function in setData.
 Note: I don't advise saving per trial, especially not saving cumulative data: it
 costs memory allocation and storage space on the server. */
 
-const createTrial = function(b,t,folder,stim,cor,bStart) {
-	// helper function that dynamically determines the stimulus as it creates each trial
-  const setTrial = function(trial) {
-    console.log(folder);
-    trial.stimulus = `<div class="exp"><img class="stim center" src="${imgP}images${folder}/image${stim}.png"></div>`;
-    trial.data.key_answer = cor;
-    trial.key_answer = KEYS[cor];
-    return trial;
-  }
+const createTrial = function(b,t,folder,stim,cor,FBprobSeq,bStart) { //function(b,t,folder,stim,cor,bStart) { // without prob. reward 
+    // helper function that dynamically determines the stimulus as it creates each trial
+    const setTrial = function(trial) {
+        console.log(folder);
+        trial.stimulus = `<div class="exp"><img class="stim center"   src="${imgP}images${folder}/image${stim}.png"></div>`;
+        trial.data.key_answer = cor;
+        trial.key_answer = KEYS[cor];
+        let n = getRandomInt(0,1);
+        if (n < FBprobSeq) {
+            //give reward, set the correct_text based on the prob. of reward.
+            trial.correct_text = COR_1_FB;
+            trial.data.reward = true;
+        } else {
+            trial.correct_text = COR_0_FB;
+            trial.data.reward = false;
+        };
+        return trial;
+    }
 	// helper function that dynamically updates the data object with info like key press. you can add other values to data as needed
   const setData = function(data) {
     let answer = data.key_press;
@@ -168,9 +177,9 @@ const createTrial = function(b,t,folder,stim,cor,bStart) {
 	// initialize the trial object
   let trial = {
     type: "categorize-html",
-    correct_text: COR_FB,
-    incorrect_text: INCOR_FB,
     on_start: setTrial,
+    //correct_text: COR_1_FB, // the correct_text style is set in setTrial. 
+    incorrect_text: INCOR_FB,
     choices: KEYS,
     timeout_message: TO_MSG,
     trial_duration: TRIAL_DUR,
@@ -178,9 +187,9 @@ const createTrial = function(b,t,folder,stim,cor,bStart) {
     on_finish: setData,
     show_stim_with_feedback: false,
     data: {
-      set: folder,
-      block: b,
-      trial: t+1,
+        set: folder,
+        block: b,
+        trial: t+1, 
     }
   };
   timeline.push(trial);

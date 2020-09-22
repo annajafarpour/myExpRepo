@@ -14,8 +14,8 @@ timeline.push({
 timeline.push({
   type: "html-keyboard-response",
   stimulus: `<div class='center'><p>After you press a key, you will receive feedback on whether\
-  you pressed the correct key for that image. Specifically, you will receive <span style="color:green;">+1</span> point if you were\
-  correct, and <span style="color:red;">0</span> otherwise. There is only one correct key per image.</p></div>`+CONTINUE,
+  you pressed the correct key for that image. Specifically, you will receive <span style="color:green;">+1</span> or <span style="color:green;">0</span> point if you were\
+  correct. The probability of getting a point is variable. If you select a wrong key, you will get no point and will see <span style="color:red;">0</span>. There is only one correct key per image.</p></div>`+CONTINUE,
   choices: [32],
 });
 timeline.push({

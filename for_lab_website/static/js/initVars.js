@@ -9,7 +9,7 @@ const KEYS = [74,75,76]; // numeric codes for j,k,l
 const SETSIZES =[2,3,4,5,6];
 const NUM_BLOCKS = 19; //2;
 const NUM_STIM_REPS = 12; //13;
-const NUM_CONDS = 10;
+//const NUM_CONDS = 10; // was unused
 const FOLDERS = [2,3]; // names of your image folders
 
 // trial timing and timeout parameters
@@ -20,8 +20,11 @@ const imgP = 'static/img/';
 
 // feedback/timeout mesages
 const TO_MSG = '<div class="exp"><p class="center fb">You took too long to respond!</p></div>';
-const COR_FB = '<div class="exp"><p class="center fb cor">+1</p></div>';
-const INCOR_FB = '<div class="exp"><p class="center fb incor">0</p></div>';
+
+// feedback messages
+const COR_1_FB = '<div class="exp"><p class="center fb cor">correct: +1</p></div>';
+const COR_0_FB = '<div class="exp"><p class="center fb cor">correct: 0</p></div>';
+const INCOR_FB = '<div class="exp"><p class="center fb incor">incorrect: 0</p></div>';
 
 const CONTINUE = '<p class="continue">[Press SPACE to continue]</p>'; // instruction page footer
 const END_LINK = "https://experiments-ccn.berkeley.edu/" // if participants need to be redirected to a page to obtain credit
