@@ -26,7 +26,7 @@ timeline.push({
 });
 timeline.push({
   type: "html-keyboard-response",
-  stimulus: `<div class='center'><p>In this demo there are 2 blocks (ns=3 and ns=6). You will see the images to learn\
+  stimulus: `<div class='center'><p> You will see the images to learn\
   at the beginning of each block – take some time to identify the images before the block begins.</p></div>`+CONTINUE,
   choices: [32],
 });

@@ -26,7 +26,7 @@
   <script src="static/js/createInstructions.js"></script>
   <!--import your functions for calling PHP files to save/upload data-->
   <script src="static/js/saveAndMail.js"></script>
-
+    <!--import the const sequenceAll for the information about the expeirment--<script src="static/js/sequenceAll.js"></script>-->
 </head>
 <body></body>
 <script type="text/javascript">
@@ -47,7 +47,7 @@ if(!IS_DEBUG) createInstructions(); // create instructions
 // use a Promise if you're importing data since it takes longer to import local data than running
 // the functions that create the rest of the task. you can avoid promise chains if you import your
 // sequences that are stored somewhere online via XMLHttpRequest().
-Papa.parsePromise(`static/csv/sequence${n}.csv`)
+Papa.parsePromise(`static/csv/sequence${Math.floor(n/40)+n+1}.csv`) //
 
   .then(results => {return createPhase(results);}) // then use previous results as argument for your main experiment function
 
@@ -58,12 +58,14 @@ Papa.parsePromise(`static/csv/sequence${n}.csv`)
     });
   });
 
+/*
 // otherwise, just run your functions and initialize jsPsych without a promise chain
-// createPhase():
-// jsPsych.init({
-//   timeline: timeline,
-//   preload_images: IMGS,
-// });
-
+createPhase():
+jsPsych.init({
+  timeline: timeline,
+  preload_images: IMGS,
+});
+*/
+    
 </script>
 </html>

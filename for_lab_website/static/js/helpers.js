@@ -20,3 +20,22 @@ Papa.parsePromise = function(file) {
 		});
 	});
 };
+
+// function to retrieve online csvs
+const getCSV = function(phase,n) {
+  let csv = [];
+  let requestP = new XMLHttpRequest();
+  requestP.open("GET", `https://raw.githubusercontent.com/arzou/sequences/master/hsRLWM/RLWM_${phase}_seq${n}.csv`, false); // URL of csv
+  requestP.send(null);
+
+  let jsonObject = requestP.responseText.split(/\r?\n|\r/); // parses the csv as a json object
+  for (var i = 0; i < jsonObject.length; i++) {
+    let t = jsonObject[i].split(',');
+    csv.push(t.map(Number)); // restructure the json object as 2D array
+  }
+  return csv;
+}
+
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}

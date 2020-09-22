@@ -7,8 +7,8 @@ const IS_DEBUG = false;
 // experiment parameters
 const KEYS = [74,75,76]; // numeric codes for j,k,l
 const SETSIZES =[2,3,4,5,6];
-const NUM_BLOCKS = 2;
-const NUM_STIM_REPS = 13;
+const NUM_BLOCKS = 19; //2;
+const NUM_STIM_REPS = 12; //13;
 const NUM_CONDS = 10;
 const FOLDERS = [2,3]; // names of your image folders
 
@@ -31,7 +31,7 @@ const END_LINK = "https://experiments-ccn.berkeley.edu/" // if participants need
 const IMGS = [];
 for (f = 0; f < FOLDERS.length; f++) {
   for (i = 1; i < 7; i++) {
-    IMGS.push(`${imgP}images${FOLDERS[f]}/image${i}.jpg`);
+    IMGS.push(`${imgP}images${FOLDERS[f]}/image${i}.png`);
   }
 }
 console.log(IMGS);

@@ -10,14 +10,34 @@ the return statement is needed for the next then statement in your promise chain
 when you run jsPsych.init.*/
 const createPhase = function(csv) { // create a phase (e.g. training phase) of your task
   csv = csv.data;
+    /* rows of: 
+        0- subjID, number
+        1- stimuli
+        2- action
+        3- rule
+        4- ns
+        5- block_index
+        6_imgFolder
+        7-FBprobSeq
+    */
   let seqs = {}; // convert 2D array into object
+    
+  seqs.allStims = csv[1];   // sequence of all stimuli across blocks
+  seqs.corKey   = csv[3];     // sequence of all correct key responses across blocks
+  seqs.setSizes     = csv[4];    // sequence of all set sizes across blocks
+  seqs.allBlocks    = csv[5];   // sequence of all block numbers across blocks
+  seqs.imgFolders   = csv[6]; // sequence of all image folders across blocks
+  seqs.FBprobSeq    = csv[7]; // sequence of all probability of reward
+  csv = [];
+    
+/* for demo: sequence0
   seqs.allStims = csv[0];   // sequence of all stimuli across blocks
   seqs.corKey = csv[1];     // sequence of all correct key responses across blocks
   seqs.setSizes = csv[2];    // sequence of all set sizes across blocks
   seqs.allBlocks = csv[3];   // sequence of all block numbers across blocks
   seqs.imgFolders = csv[4]; // sequence of all image folders across blocks
   csv = [];
-
+*/
   for (b = 1; b < NUM_BLOCKS + 1; b++) { // to index starting at 1
     createBlock(b,seqs); // create each block based on condition, set size, and stim image set
   }
@@ -35,7 +55,7 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
     choices: jsPsych.NO_KEYS,
     trial_duration: 5000, // change this depending on how large your file is
     on_finish: data => {
-      mail_data_csv(file_name); // mail the data file you just saved
+      //mail_data_csv(file_name); // mail the data file you just saved
     }
   });
 
@@ -57,39 +77,43 @@ points or further instructions. This is a good place to save your data.*/
 
 const createBlock = function(b,seqs) {
 	// get folders, setsize, number of trials for this block
-  let bStart = seqs.allBlocks.indexOf(b);
-  let setSize = seqs.setSizes[bStart];
-  let folder = seqs.imgFolders[bStart];
-  let numTrials = setSize * NUM_STIM_REPS;
-
+    let bStart = seqs.allBlocks.indexOf(b);
+    let setSize = seqs.setSizes[bStart];
+    let folder = seqs.imgFolders[bStart];
+    let numTrials = setSize * NUM_STIM_REPS;
+    let bEnd = bStart+numTrials;
+    var stimSet = seqs.allStims.slice(bStart,bEnd).filter(onlyUnique); // id of stimuli img
+    
 	// a helper function that adds all the image stimuli for this block. this allows the image files
 	// to be dynamically created at the start of each block, so the images will be different to each block according to the image folder.
-  const setStim = function(trial) {
-    let stim = "<div class='exp'><p>Take some time to identify the images below:</p><table class='center'>";
-    for (s=1; s < setSize+1; s++) {
-      if (s%3 == 1) stim += '<tr>'
-      stim += `<td><img class="disp" src="${imgP}images${folder}/image${s}.jpg"></td>`;
-      if (s%3 == 0) stim += '</tr>'
-    }
-    trial.stimulus = `${stim}</table></div>`+CONTINUE;
-    return trial;
+    const setStim = function(trial) {
+        let stim = "<div class='exp'><p>Take some time to identify the images below:</p><table class='center'>";
+        for (s=1; s < setSize+1; s++) {
+            if (s%3 == 1) stim += '<tr>'
+            stim += `<td><img class="disp" src="${imgP}images${folder}/image${stimSet[s-1]}.png"></td>`; 
+            if (s%3 == 0) stim += '</tr>'
+            }
+        trial.stimulus = `${stim}</table></div>`+CONTINUE;
+        return trial;
 
-	// push the instructions showing all block images to timeline before trials
-  }
-  timeline.push({
-    on_start: setStim,
-    type: "html-keyboard-response",
-    choices: [32],
-    // you may want to make this timed so participants can't stay on this trial forever
-  });
+	   // push the instructions showing all block images to timeline before trials
+    }
+    timeline.push({
+        on_start: setStim,
+        type: "html-keyboard-response",
+        choices: [32],
+        // you may want to make this timed so participants can't stay on this trial forever
+    });
 
 	// 	create trials, interleaving them with fixation
-  for (t = 0; t < numTrials; t++) {
-    timeline.push(fixation);
-    let stim = seqs.allStims[bStart+t];
-    let cor = seqs.corKey[bStart+t];
-    createTrial(b,t,folder,stim,cor,bStart);
-  }
+    for (t = 0; t < numTrials; t++) {
+        timeline.push(fixation);
+        let stim = seqs.allStims[bStart+t];
+        let cor = seqs.corKey[bStart+t];
+        let FBprobSeq = seqs.FBprobSeq[bStart+t];
+        //createTrial(b,t,folder,stim,cor,FBprobSeq,bStart);
+        createTrial(b,t,folder,stim,cor,bStart);
+    }
 
   /*A helper function that updates points earned for that block. It also saves all of the
   data if it's the last block, or data for just that block if it's not the last block.*/
@@ -99,8 +123,9 @@ const createBlock = function(b,seqs) {
     let blockFileName = `${file_name}_block_${b}`; // create new file name for block data
     save_data_csv(blockFileName, toSave); // save block data
 
-    let pts = jsPsych.data.get().filter({block: b, correct: true}).count(); // calculate points
-    console.log(pts);
+    //let pts = jsPsych.data.get().filter({block: b, rewarded: true}).count(); // calculate points
+      let pts = jsPsych.data.get().filter({block: b, correct: true}).count(); // calculate points
+    //console.log(pts);
     trial.stimulus = `<div class="center"><p>Total number of earned points: ${pts} out of ${numTrials}.</p>\
     <br><p>End of block - Please take a break!</p><br><p>Press space when \
     you're ready to move to the next block.</p></div>`;
@@ -128,7 +153,7 @@ const createTrial = function(b,t,folder,stim,cor,bStart) {
 	// helper function that dynamically determines the stimulus as it creates each trial
   const setTrial = function(trial) {
     console.log(folder);
-    trial.stimulus = `<div class="exp"><img class="stim center" src="${imgP}images${folder}/image${stim}.jpg"></div>`;
+    trial.stimulus = `<div class="exp"><img class="stim center" src="${imgP}images${folder}/image${stim}.png"></div>`;
     trial.data.key_answer = cor;
     trial.key_answer = KEYS[cor];
     return trial;
