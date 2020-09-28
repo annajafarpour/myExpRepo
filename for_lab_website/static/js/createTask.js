@@ -30,6 +30,9 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
   seqs.FBprobSeq    = csv[7]; // sequence of all probability of reward
   csv = [];
 
+  let numBlocks = d3.max(seqs.allBlocks);
+  if (IS_DEBUG) numBlocks = 3; // debug mode is only first 4 block
+
 /* for demo: sequence0
   seqs.allStims = csv[0];   // sequence of all stimuli across blocks
   seqs.corKey = csv[1];     // sequence of all correct key responses across blocks
@@ -38,7 +41,7 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
   seqs.imgFolders = csv[4]; // sequence of all image folders across blocks
   csv = [];
 */
-  for (b = 1; b < NUM_BLOCKS + 1; b++) { // to index starting at 1
+  for (b = 1; b < numBlocks + 1; b++) { // to index starting at 1
     createBlock(b,seqs); // create each block based on condition, set size, and stim image set
   }
 
@@ -105,13 +108,14 @@ const createBlock = function(b,seqs) {
         // you may want to make this timed so participants can't stay on this trial forever
     });
 
+  if (IS_DEBUG) numTrials /= 6;
 	// 	create trials, interleaving them with fixation
     for (t = 0; t < numTrials; t++) {
         timeline.push(fixation);
         let stim = seqs.allStims[bStart+t];
         let cor = seqs.corKey[bStart+t];
         let FBprobSeq = seqs.FBprobSeq[bStart+t];
-        createTrial(b,t,folder,stim,cor,FBprobSeq,bStart);
+        createTrial(b,t,folder,stim,cor,FBprobSeq,setSize,bStart);
         //createTrial(b,t,folder,stim,cor,bStart); // without prob. reward if correct.
     }
 
@@ -149,7 +153,7 @@ You can also call your save function in setData.
 Note: I don't advise saving per trial, especially not saving cumulative data: it
 costs memory allocation and storage space on the server. */
 
-const createTrial = function(b,t,folder,stim,cor,FBprobSeq,bStart) { //function(b,t,folder,stim,cor,bStart) { // without prob. reward
+const createTrial = function(b,t,folder,stim,cor,FBprobSeq,setSize,bStart) { //function(b,t,folder,stim,cor,bStart) { // without prob. reward
     // helper function that dynamically determines the stimulus as it creates each trial
     const setTrial = function(trial) {
         console.log(folder);
@@ -191,6 +195,8 @@ const createTrial = function(b,t,folder,stim,cor,FBprobSeq,bStart) { //function(
         set: folder,
         block: b,
         trial: t+1,
+        fb_prob: FBprobSeq,
+        ns: setSize,
     }
   };
   timeline.push(trial);

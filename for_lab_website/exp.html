@@ -36,7 +36,7 @@ if (isNaN(subjID)) { // if there is no value, and your counterbalancing depends 
   subjID = getRandomInt(1,10);
 }
 
-let file_name = `myExp_${subjID}`; // create name for your data file
+let file_name = `probWMRL_${subjID}`; // create name for your data file
 let n = 0; //subjID % numConds; // set up your counterbalancing variable
 
 // declare timeline
@@ -66,6 +66,6 @@ jsPsych.init({
   preload_images: IMGS,
 });
 */
-    
+
 </script>
 </html>

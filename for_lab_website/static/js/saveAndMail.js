@@ -2,8 +2,9 @@
 You will only have to change the three string variables outside the functions. */
 
 // URL of where the PHP files are located -- replace with whatever website/directory you end up using
- const save_url = "https://experiments-ccn.berkeley.edu/demoRLWM/save_data.php";
- const mail_url = "https://experiments-ccn.berkeley.edu/demoRLWM/data/mailer.php";
+const task_name = 'probWMRL';
+ const save_url = "https://experiments-ccn.berkeley.edu/probWMRL/save_data.php";
+ const mail_url = "https://experiments-ccn.berkeley.edu/probWMRL/data/mailer.php";
 // name of folder where data will be saved
 const data_dir = "data";
 
