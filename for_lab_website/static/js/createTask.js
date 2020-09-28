@@ -10,7 +10,7 @@ the return statement is needed for the next then statement in your promise chain
 when you run jsPsych.init.*/
 const createPhase = function(csv) { // create a phase (e.g. training phase) of your task
   csv = csv.data;
-    /* rows of: 
+    /* rows of:
         0- subjID, number
         1- stimuli
         2- action
@@ -21,7 +21,7 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
         7-FBprobSeq
     */
   let seqs = {}; // convert 2D array into object
-    
+
   seqs.allStims = csv[1];   // sequence of all stimuli across blocks
   seqs.corKey   = csv[2];     // sequence of all correct key responses across blocks
   seqs.setSizes     = csv[4];    // sequence of all set sizes across blocks
@@ -29,7 +29,7 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
   seqs.imgFolders   = csv[6]; // sequence of all image folders across blocks
   seqs.FBprobSeq    = csv[7]; // sequence of all probability of reward
   csv = [];
-    
+
 /* for demo: sequence0
   seqs.allStims = csv[0];   // sequence of all stimuli across blocks
   seqs.corKey = csv[1];     // sequence of all correct key responses across blocks
@@ -47,15 +47,15 @@ const createPhase = function(csv) { // create a phase (e.g. training phase) of y
   e.g. 5 seconds, you can call a callback function to then mail off the data.*/
   timeline.push({
     on_start: trial => {
-      let toSave = jsPsych.data.get(); // retrieve all data to save
+      let toSave = jsPsych.data.get().filter({trial_type: 'trial'}).ignore('internal_node_id'); // retrieve all data to save
       save_data_csv(file_name,toSave); // save final file as csv
     },
     type: "html-keyboard-response",
     stimulus: "<div class='center'><p>Saving data... please do not close this window. This will take a few seconds. </p></div>",
     choices: jsPsych.NO_KEYS,
-    trial_duration: 5000, // change this depending on how large your file is
+    trial_duration: 7000, // change this depending on how large your file is
     on_finish: data => {
-      //mail_data_csv(file_name); // mail the data file you just saved
+      mail_data_csv(file_name); // mail the data file you just saved
     }
   });
 
@@ -83,14 +83,14 @@ const createBlock = function(b,seqs) {
     let numTrials = setSize * NUM_STIM_REPS;
     let bEnd = bStart+numTrials;
     var stimSet = seqs.allStims.slice(bStart,bEnd).filter(onlyUnique); // id of stimuli img
-    
+
 	// a helper function that adds all the image stimuli for this block. this allows the image files
 	// to be dynamically created at the start of each block, so the images will be different to each block according to the image folder.
     const setStim = function(trial) {
         let stim = "<div class='exp'><p>Take some time to identify the images below:</p><table class='center'>";
         for (s=1; s < setSize+1; s++) {
             if (s%3 == 1) stim += '<tr>'
-            stim += `<td><img class="disp" src="${imgP}images${folder}/image${stimSet[s-1]}.png"></td>`; 
+            stim += `<td><img class="disp" src="${imgP}images${folder}/image${stimSet[s-1]}.png"></td>`;
             if (s%3 == 0) stim += '</tr>'
             }
         trial.stimulus = `${stim}</table></div>`+CONTINUE;
@@ -115,14 +115,14 @@ const createBlock = function(b,seqs) {
         //createTrial(b,t,folder,stim,cor,bStart); // without prob. reward if correct.
     }
 
-  /*A helper function that updates points earned for that block. It also saves all of the
-  data if it's the last block, or data for just that block if it's not the last block.*/
+  /*A helper function that updates points earned for that block. It also saves the data
+  from that block.*/
   const setPoints = function(trial) {
 
         let toSave = jsPsych.data.get().filter({block: b}); // retrieve block data to save
         let blockFileName = `${file_name}_block_${b}`; // create new file name for block data
         save_data_csv(blockFileName, toSave); // save block data
-        
+
         let pts = jsPsych.data.get().filter({block: b, reward: true}).count(); // calculate points based on reward
       //let pts = jsPsych.data.get().filter({block: b, correct: true}).count(); // calculate points
         console.log(pts);
@@ -149,7 +149,7 @@ You can also call your save function in setData.
 Note: I don't advise saving per trial, especially not saving cumulative data: it
 costs memory allocation and storage space on the server. */
 
-const createTrial = function(b,t,folder,stim,cor,FBprobSeq,bStart) { //function(b,t,folder,stim,cor,bStart) { // without prob. reward 
+const createTrial = function(b,t,folder,stim,cor,FBprobSeq,bStart) { //function(b,t,folder,stim,cor,bStart) { // without prob. reward
     // helper function that dynamically determines the stimulus as it creates each trial
     const setTrial = function(trial) {
         console.log(folder);
@@ -172,13 +172,14 @@ const createTrial = function(b,t,folder,stim,cor,FBprobSeq,bStart) { //function(
     let answer = data.key_press;
     data.stimulus = stim;
     data.key_press = KEYS.indexOf(answer);
+    data.trial_type = 'trial';
     return data;
   }
 	// initialize the trial object
   let trial = {
     type: "categorize-html",
     on_start: setTrial,
-    //correct_text: COR_1_FB, // the correct_text style is set in setTrial. 
+    //correct_text: COR_1_FB, // the correct_text style is set in setTrial.
     incorrect_text: INCOR_FB,
     choices: KEYS,
     timeout_message: TO_MSG,
@@ -189,7 +190,7 @@ const createTrial = function(b,t,folder,stim,cor,FBprobSeq,bStart) { //function(
     data: {
         set: folder,
         block: b,
-        trial: t+1, 
+        trial: t+1,
     }
   };
   timeline.push(trial);
