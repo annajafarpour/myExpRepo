@@ -105,7 +105,14 @@ const createBlock = function(b,seqs) {
         on_start: setStim,
         type: "html-keyboard-response",
         choices: [32],
-        // you may want to make this timed so participants can't stay on this trial forever
+        trial_duration: 10000,// you may want to make this timed so participants can't stay on this trial forever
+    });
+
+    timeline.push({
+        type: "html-keyboard-response",
+        stimulus: "<div class='exp'><p>Block about to begin!</p></div>",
+        choices: jsPsych.NO_KEYS,
+        trial_duration: 1000,
     });
 
   if (IS_DEBUG) numTrials /= 6;
@@ -131,7 +138,7 @@ const createBlock = function(b,seqs) {
       //let pts = jsPsych.data.get().filter({block: b, correct: true}).count(); // calculate points
         console.log(pts);
         trial.stimulus = `<div class="center"><p>Total number of earned points: ${pts} out of ${numTrials}.</p>\
-        <br><p>End of block - Please take a break!</p><br><p>Press space when \
+        <br><p>End of block - Please take a break! You have 30 seconds to take a break. </p><br><p>Press space when \
         you're ready to move to the next block.</p></div>`;
   }
 
@@ -140,7 +147,14 @@ const createBlock = function(b,seqs) {
     on_start: setPoints,
     type: "html-keyboard-response",
     choices: [32],
-    // you may want to make this timed so participants can't wait on this trial forever
+    trial_duration: 30000,// you may want to make this timed so participants can't wait on this trial forever
+  });
+
+  timeline.push({
+      type: "html-keyboard-response",
+      stimulus: "<div class='exp'><p>Continuing to the next block</p></div>",
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 1000,
   });
 }
 
