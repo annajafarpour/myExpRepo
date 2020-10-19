@@ -134,8 +134,7 @@ const createBlock = function(b,seqs) {
         let blockFileName = `${file_name}_block_${b}`; // create new file name for block data
         save_data_csv(blockFileName, toSave); // save block data
 
-        let pts = jsPsych.data.get().filter({block: b, reward: true}).count(); // calculate points based on reward
-      //let pts = jsPsych.data.get().filter({block: b, correct: true}).count(); // calculate points
+        let pts = jsPsych.data.get().filter({block: b, reward: true, correct: true}).count(); // calculate points based on reward
         console.log(pts);
         trial.stimulus = `<div class="center"><p>Total number of earned points: ${pts} out of ${numTrials}.</p>\
         <br><p>End of block - Please take a break! You have 30 seconds to take a break. </p><br><p>Press space when \
