@@ -27,7 +27,7 @@ const COR_0_FB = '<div class="exp"><p class="center fb cor">correct: 0</p></div>
 const INCOR_FB = '<div class="exp"><p class="center fb incor">incorrect: 0</p></div>';
 
 const CONTINUE = '<p class="continue">[Press SPACE to continue]</p>'; // instruction page footer
-const END_LINK = "https://experiments-ccn.berkeley.edu/" // if participants need to be redirected to a page to obtain credit
+const END_LINK = "https://experiments-ccn.berkeley.edu/exp_EventSegMovies/EvemtSeg_exp.html"; // if participants need to be redirected to a page to obtain credit
 
 // string array of all img files, each element is the path of an img to import
 // this is used for preloading
