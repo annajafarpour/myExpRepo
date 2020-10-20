@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <!--title will appear on the browser tab-->
-  <title>My Experiment</title>
+  <title>probWMRL</title>
   <!--import jquery via google's CDN-->
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'></script>
   <!--import your css stylesheets-->
@@ -46,7 +46,7 @@ if(!IS_DEBUG) createInstructions(); // create instructions
 
 // use a Promise if you're importing data since it takes longer to import local data than running
 // the functions that create the rest of the task. you can avoid promise chains if you import your
-// sequences that are stored somewhere online via XMLHttpRequest().
+// sequences that are stored somewhere online via XMLHttpRequest().sta
 Papa.parsePromise(`static/csv/sequence${Math.floor(n/40)+n+1}.csv`) //
 
   .then(results => {return createPhase(results);}) // then use previous results as argument for your main experiment function
